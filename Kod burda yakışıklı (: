@@ -1,0 +1,124 @@
+```cpp
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+
+using namespace std;
+
+const int INITIAL_MONEY = 1000;
+
+void displayMenu();
+void rollDice(int &money);
+void drawCard(int &money);
+int getValidInput(int minValue, int maxValue);
+void saveScores(int money);
+
+int main() {
+    srand(time(0));
+    int money = INITIAL_MONEY;
+    int choice;
+
+    cout << "Welcome to the Console Casino Game!" << endl;
+    cout << "You start with " << INITIAL_MONEY << " virtual dollars." << endl;
+
+    while (true) {
+        displayMenu();
+        choice = getValidInput(1, 4);
+
+        switch (choice) {
+        case 1:
+            rollDice(money);
+            break;
+        case 2:
+            drawCard(money);
+            break;
+        case 3:
+            saveScores(money);
+            cout << "Scores saved. Exiting game." << endl;
+            return 0;
+        case 4:
+            cout << "Exiting game without saving." << endl;
+            return 0;
+        }
+
+        if (money <= 0) {
+            cout << "You have run out of money! Game over!" << endl;
+            return 0;
+        }
+    }
+}
+
+void displayMenu() {
+    cout << "\n1. Roll Dice" << endl;
+    cout << "2. Draw Card" << endl;
+    cout << "3. Save and Exit" << endl;
+    cout << "4. Exit without Saving" << endl;
+    cout << "Choose an option: ";
+}
+
+void rollDice(int &money) {
+    int bet;
+    cout << "Enter your bet for dice rolling (Current Money: " << money << "): ";
+    bet = getValidInput(1, money);
+
+    int playerDice = rand() % 6 + 1;
+    int casinoDice = rand() % 6 + 1;
+
+    cout << "You rolled: " << playerDice << " | Casino rolled: " << casinoDice << endl;
+
+    if (playerDice > casinoDice) {
+        money += bet;
+        cout << "You win! New balance: " << money << endl;
+    } else {
+        money -= bet;
+        cout << "You lose! New balance: " << money << endl;
+    }
+}
+
+void drawCard(int &money) {
+    int bet;
+    cout << "Enter your bet for card drawing (Current Money: " << money << "): ";
+    bet = getValidInput(1, money);
+
+    int playerCard = rand() % 13 + 1;
+    int casinoCard = rand() % 13 + 1;
+
+    cout << "You drew: " << playerCard << " | Casino drew: " << casinoCard << endl;
+
+    if (playerCard > casinoCard) {
+        money += bet;
+        cout << "You win! New balance: " << money << endl;
+    } else {
+        money -= bet;
+        cout << "You lose! New balance: " << money << endl;
+    }
+}
+
+int getValidInput(int minValue, int maxValue) {
+    int input;
+    while (true) {
+        cin >> input;
+        if (cin.fail() || input < minValue || input > maxValue) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input, please try again: ";
+        } else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return input;
+        }
+    }
+}
+
+void saveScores(int money) {
+    ofstream scoreFile("casino_scores.txt", ios::app);
+    if (scoreFile.is_open()) {
+        scoreFile << "Money left: " << money << endl;
+        scoreFile.close();
+        cout << "Scores saved successfully." << endl;
+    } else {
+        cerr << "Error saving scores." << endl;
+    }
+}
+```
